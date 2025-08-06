@@ -13,10 +13,8 @@ int world_size;
 
 int main(int argc, char **argv)
 {
-    // Initialize the MPI environment
     MPI_Init(&argc, &argv);
 
-    // Get the number of processes and the rank of this process
     MPI_Comm_size(MPI_COMM_WORLD, &world_size);
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
 
@@ -35,27 +33,21 @@ int main(int argc, char **argv)
 
     if (world_rank == 0)
     {
-        // Rank 0 is the controller
         controller_process();
     }
     else
     {
-        // All other ranks are walkers
         walker_process();
     }
 
-    // Finalize the MPI environment
     MPI_Finalize();
     return 0;
 }
 
 void walker_process()
 {
-    // Seed the random number generator.
-    // Using rank ensures each walker gets a different sequence of random numbers.
-    srand(time(NULL) + world_rank);
-
-    //int position = 0;
+    srand(time(NULL) + world_rank);  // Seed with time + rank for randomness
+    int position = 0;
     int steps = 0;
 
     for (steps = 1; steps <= max_steps; ++steps)
@@ -84,7 +76,6 @@ void walker_process()
 
 void controller_process()
 {
-    //{
     int walkers = world_size - 1;
     int msg;
     MPI_Status status;
@@ -96,11 +87,4 @@ void controller_process()
     }
 
     std::cout << "Controller: All " << walkers << " walkers have finished." << std::endl;
-} TODO: Implement the logic for the controller process.
-    // 1. Determine the number of walkers (world_size - 1).
-    // 2. Loop that many times to receive a message from each walker.
-    // 3. Use MPI_Recv to wait for a message. Use MPI_ANY_SOURCE to accept
-    //    a message from any walker that finishes.
-    // 4. After receiving messages from all walkers, print a final summary message.
-    //    For example: "Controller: All X walkers have finished."
 }
